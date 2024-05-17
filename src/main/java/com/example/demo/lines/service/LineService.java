@@ -34,6 +34,11 @@ public class LineService {
         return repository.findAll(PageRequest.of(page, size));
     }
 
+    @Transactional(readOnly = true)
+    public List<LineEntity> getAll() {
+        return repository.findAll();
+    }
+
     @Transactional
     public LineEntity get(Long id) {
         return repository.findById(id)

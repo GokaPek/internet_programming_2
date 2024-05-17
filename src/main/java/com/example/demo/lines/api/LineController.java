@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,14 +25,14 @@ import com.example.demo.lines.service.LineService;
 
 import jakarta.validation.Valid;
 
-@RestController
+@Controller
 @RequestMapping(LineController.URL)
 public class LineController {
-    public static final String URL = Constants.ADMIN_PREFIX + "/lines";
-    private static final String LINE_VIEW = "lines";
+    public static final String URL = "/line";
+    private static final String LINE_VIEW = "line";
     private static final String LINE_EDIT_VIEW = "line-edit";
-    private static final String LINE_ATTRIBUTE = "lines";
-    private static final String PAGE_ATTRIBUTE = "lines";
+    private static final String LINE_ATTRIBUTE = "line";
+    private static final String PAGE_ATTRIBUTE = "line";
 
     private final LineService lineService;
     private final ItemService itemService;
@@ -70,6 +71,8 @@ public class LineController {
     //         @RequestParam(name = "size", Constants.DEFUALT_PAGE_SIZE) int size) {
     //     return PageDtoMapper.toDto(lineService.getAll(page, size), this::toDto);
     // }
+
+    /* 
     @GetMapping
     public String getAll(
             @RequestParam(name = PAGE_ATTRIBUTE, defaultValue = "0") int page,
@@ -78,6 +81,17 @@ public class LineController {
                 lineService.getAll(page, Constants.DEFUALT_PAGE_SIZE), this::toDto);
         model.addAllAttributes(attributes);
         model.addAttribute(PAGE_ATTRIBUTE, page);
+        return LINE_VIEW;
+    }
+
+    */
+
+    @GetMapping
+    public String getAll(Model model) {
+        model.addAttribute("lines",
+                lineService.getAll().stream()
+                        .map(this::toDto)
+                        .toList());
         return LINE_VIEW;
     }
 

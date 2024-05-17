@@ -3,7 +3,6 @@ package com.example.demo.lines.api;
 import java.util.List;
 import java.util.Map;
 
-//import org.hibernate.mapping.Map;
 import org.modelmapper.ModelMapper;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,13 +25,13 @@ import com.example.demo.lines.service.LineService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping(LineController.URL + "/line")
+@RequestMapping(LineController.URL)
 public class LineController {
-    public static final String URL = Constants.ADMIN_PREFIX + "/line";
-    private static final String LINE_VIEW = "line";
+    public static final String URL = Constants.ADMIN_PREFIX + "/lines";
+    private static final String LINE_VIEW = "lines";
     private static final String LINE_EDIT_VIEW = "line-edit";
-    private static final String LINE_ATTRIBUTE = "line";
-    private static final String PAGE_ATTRIBUTE = "page";
+    private static final String LINE_ATTRIBUTE = "lines";
+    private static final String PAGE_ATTRIBUTE = "lines";
 
     private final LineService lineService;
     private final ItemService itemService;

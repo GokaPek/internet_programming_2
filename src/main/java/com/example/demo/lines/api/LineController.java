@@ -6,8 +6,10 @@ import java.util.Map;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.core.api.PageAttributesMapper;
 import com.example.demo.core.configuration.Constants;
+import com.example.demo.items.api.ItemDto;
+import com.example.demo.items.model.ItemEntity;
 import com.example.demo.items.service.ItemService;
 import com.example.demo.lines.model.LineEntity;
 import com.example.demo.lines.model.LineGrouped;
@@ -32,7 +36,7 @@ public class LineController {
     private static final String LINE_VIEW = "line";
     private static final String LINE_EDIT_VIEW = "line-edit";
     private static final String LINE_ATTRIBUTE = "line";
-    private static final String PAGE_ATTRIBUTE = "lines";
+    private static final String PAGE_ATTRIBUTE = "line";
 
     private final LineService lineService;
     private final ItemService itemService;
@@ -102,15 +106,42 @@ public class LineController {
         return lineService.getTop(0, 5).stream().map(this::toGroupedDto).toList();
     }
 
-    @PostMapping
-    public LineDto create(@RequestBody @Valid LineDto dto) {
-        return toDto(lineService.create(toEntity(dto)));
+    @GetMapping("/edit/")
+    public String create(Model model) { {
+        model.addAttribute(LINE_ATTRIBUTE, new LineDto());
+        return LINE_EDIT_VIEW;
+        }
     }
 
-    @PutMapping("/{id}")
-    public LineDto update(@PathVariable(name = "id") Long id, @RequestBody LineDto dto) {
-        return toDto(lineService.update(id, toEntity(dto)));
+    @PostMapping("/edit/")
+    public String create(
+            @ModelAttribute(name = LINE_ATTRIBUTE) @Valid LineDto line,
+            BindingResult bindingResult,
+            Model model) {
+        if (bindingResult.hasErrors()) {
+            return LINE_EDIT_VIEW;
+        }
+        lineService.create(toEntity(line));
+        return Constants.REDIRECT_VIEW + URL;
     }
+
+    @PostMapping("/edit/{id}")
+    public String update(
+            @PathVariable(name = "id") Long id,
+            Model model) {
+        if (id <= 0) {
+            throw new IllegalArgumentException();
+        }
+        // Получаем список всех item
+        model.addAttribute("items", itemService.getAll());
+        model.addAttribute(LINE_ATTRIBUTE, toDto(lineService.get(id)));
+         
+        return LINE_EDIT_VIEW;
+    }
+
+    // private ItemDto toItemDto(ItemEntity entity) {
+    //     return modelMapper.map(entity, ItemDto.class);
+    // }
 
     @DeleteMapping("/{id}")
     public LineDto delete(@PathVariable(name = "id") Long id) {

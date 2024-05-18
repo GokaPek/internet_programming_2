@@ -1,21 +1,22 @@
 package com.example.demo.items.api;
 
 import java.util.List;
+import java.util.Map;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.example.demo.core.api.PageAttributesMapper;
 
 import com.example.demo.core.configuration.Constants;
 import com.example.demo.items.model.ItemEntity;
@@ -24,7 +25,7 @@ import com.example.demo.items.service.ItemService;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping(ItemController.URL + "/item")
+@RequestMapping(ItemController.URL)
 public class ItemController {
     public static final String URL = Constants.ADMIN_PREFIX + "/item";
     private static final String ITEM_VIEW = "item";
@@ -48,8 +49,13 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getAll() {
-        return itemService.getAll().stream().map(this::toDto).toList();
+    public String getAll(Model model) {
+        model.addAttribute(
+                "items",
+                itemService.getAll().stream()
+                        .map(this::toDto)
+                        .toList());
+        return ITEM_VIEW;
     }
 
     @GetMapping("/{id}")
@@ -68,7 +74,7 @@ public class ItemController {
     public String create(
             @ModelAttribute(name = ITEM_ATTRIBUTE) @Valid ItemDto item,
             BindingResult bindingResult,
-            ModelMap model) {
+            Model model) {
         if (bindingResult.hasErrors()) {
             return ITEM_EDIT_VIEW;
         }

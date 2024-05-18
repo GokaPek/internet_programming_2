@@ -70,7 +70,7 @@ public class UserProfileController {
         return modelMapper.map(entity, LineGroupedDto.class);
     }
 
-    private ItemDto toitemDto(ItemEntity entity) {
+    private ItemDto toItemDto(ItemEntity entity) {
         return modelMapper.map(entity, ItemDto.class);
     }
 
@@ -92,7 +92,7 @@ public class UserProfileController {
                         .toList());
         model.addAttribute("items",
                 itemService.getAll().stream()
-                        .map(this::toitemDto)
+                        .map(this::toItemDto)
                         .toList());
         // model.addAttribute(PROFILE_ATTRIBUTE,
         //         new UserProfileDto(userService.getUserSubscriptions(userId).stream()

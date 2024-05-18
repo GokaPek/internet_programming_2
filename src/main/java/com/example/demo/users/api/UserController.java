@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.core.api.PageAttributesMapper;
@@ -26,14 +26,16 @@ import com.example.demo.users.service.UserService;
 
 import jakarta.validation.Valid;
 
-@RestController
+@Controller
 @RequestMapping(UserController.URL)
 public class UserController {
     public static final String URL = Constants.ADMIN_PREFIX + "/user";
     private static final String USER_VIEW = "user";
     private static final String USER_EDIT_VIEW = "user-edit";
-    private static final String PAGE_ATTRIBUTE = "page";
+    private static final String PAGE_ATTRIBUTE = "user";
     private static final String USER_ATTRIBUTE = "user";
+    private static final String LINE_VIEW = "line";
+    
 
     private final UserService userService;
     private final ModelMapper modelMapper;
@@ -137,9 +139,20 @@ public class UserController {
     }
 
     @PostMapping("/edit/{id}/lines/{lineId}")
-    public UserDto addLine(@PathVariable(name = "id") Long id, @PathVariable(name = "lineId") Long lineId) {
+    public UserDto addLine(@PathVariable(name = "id") Long id, @PathVariable(name = "lineId") Long lineId){
         return toDto(userService.addLine(id, lineId));
     }
+
+    // @PostMapping("/edit/{id}/lines/{lineId}")
+    // public String addLine(
+    //     @PathVariable(name = "id") Long id,
+    //     @PathVariable(name = "lineId") Long lineId,
+    //     @RequestParam(name = PAGE_ATTRIBUTE, defaultValue = "0") int page,
+    //     RedirectAttributes redirectAttributes) {
+    //         userService.addLine(id, lineId);
+    //         redirectAttributes.addAttribute(PAGE_ATTRIBUTE, page);
+    //         return Constants.REDIRECT_VIEW + URL;
+    // }
 
     @DeleteMapping("/edit/{id}/lines/{lineId}")
     public UserDto removeLine(@PathVariable(name = "id") Long userId,

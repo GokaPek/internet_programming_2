@@ -3,6 +3,7 @@ package com.example.demo.items.api;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -22,7 +23,7 @@ import com.example.demo.items.service.ItemService;
 
 import jakarta.validation.Valid;
 
-@RestController
+@Controller
 @RequestMapping(ItemController.URL + "/item")
 public class ItemController {
     public static final String URL = Constants.ADMIN_PREFIX + "/item";

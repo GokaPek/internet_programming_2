@@ -32,7 +32,7 @@ public class LineController {
     private static final String LINE_VIEW = "line";
     private static final String LINE_EDIT_VIEW = "line-edit";
     private static final String LINE_ATTRIBUTE = "line";
-    private static final String PAGE_ATTRIBUTE = "line";
+    private static final String PAGE_ATTRIBUTE = "lines";
 
     private final LineService lineService;
     private final ItemService itemService;
@@ -72,19 +72,16 @@ public class LineController {
     //     return PageDtoMapper.toDto(lineService.getAll(page, size), this::toDto);
     // }
 
-    /* 
-    @GetMapping
-    public String getAll(
-            @RequestParam(name = PAGE_ATTRIBUTE, defaultValue = "0") int page,
-            Model model) {
-        final Map<String, Object> attributes = PageAttributesMapper.toAttributes(
-                lineService.getAll(page, Constants.DEFUALT_PAGE_SIZE), this::toDto);
-        model.addAllAttributes(attributes);
-        model.addAttribute(PAGE_ATTRIBUTE, page);
-        return LINE_VIEW;
-    }
-
-    */
+    // @GetMapping
+    // public String getAll(
+    //         @RequestParam(name = PAGE_ATTRIBUTE, defaultValue = "0") int page,
+    //         Model model) {
+    //     final Map<String, Object> attributes = PageAttributesMapper.toAttributes(
+    //             lineService.getAll(page, Constants.DEFUALT_PAGE_SIZE), this::toDto);
+    //     model.addAllAttributes(attributes);
+    //     model.addAttribute(PAGE_ATTRIBUTE, page);
+    //     return LINE_VIEW;
+    // }
 
     @GetMapping
     public String getAll(Model model) {

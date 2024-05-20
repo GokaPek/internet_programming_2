@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.context.request.WebRequest;
 
 import com.example.demo.core.api.PageAttributesMapper;
 import com.example.demo.core.configuration.Constants;
@@ -31,6 +34,7 @@ import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping(LineController.URL)
+@SessionAttributes("items")
 public class LineController {
     public static final String URL = "/line";
     private static final String LINE_VIEW = "line";
@@ -93,6 +97,10 @@ public class LineController {
                 lineService.getAll().stream()
                         .map(this::toDto)
                         .toList());
+        model.addAttribute("items", 
+            itemService.getAll().stream()
+                        .map(this::toItemDto)
+                        .toList());
         return LINE_VIEW;
     }
 
@@ -117,31 +125,41 @@ public class LineController {
     public String create(
             @ModelAttribute(name = LINE_ATTRIBUTE) @Valid LineDto line,
             BindingResult bindingResult,
-            Model model) {
+            Model model,/*!*/ SessionStatus sessionStatus) {
         if (bindingResult.hasErrors()) {
             return LINE_EDIT_VIEW;
         }
         lineService.create(toEntity(line));
+        //
+        sessionStatus.setComplete();
+        //
         return Constants.REDIRECT_VIEW + URL;
     }
 
     @PostMapping("/edit/{id}")
     public String update(
             @PathVariable(name = "id") Long id,
-            Model model) {
+            Model model, /*!*/WebRequest webRequest) {
         if (id <= 0) {
             throw new IllegalArgumentException();
         }
         // Получаем список всех item
-        model.addAttribute("items", itemService.getAll());
+
+         // Получаем список всех item и сохраняем его в сессии
+         List<ItemDto> items = itemService.getAll().stream()
+         .map(this::toItemDto)
+         .toList();
+        webRequest.setAttribute("items", items, WebRequest.SCOPE_SESSION);
+        
+
         model.addAttribute(LINE_ATTRIBUTE, toDto(lineService.get(id)));
          
         return LINE_EDIT_VIEW;
     }
 
-    // private ItemDto toItemDto(ItemEntity entity) {
-    //     return modelMapper.map(entity, ItemDto.class);
-    // }
+    private ItemDto toItemDto(ItemEntity entity) {
+         return modelMapper.map(entity, ItemDto.class);
+    }
 
     @DeleteMapping("/{id}")
     public LineDto delete(@PathVariable(name = "id") Long id) {

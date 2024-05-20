@@ -35,7 +35,6 @@ public class UserController {
     private static final String PAGE_ATTRIBUTE = "user";
     private static final String USER_ATTRIBUTE = "user";
     private static final String LINE_VIEW = "line";
-    
 
     private final UserService userService;
     private final ModelMapper modelMapper;
@@ -57,7 +56,7 @@ public class UserController {
     public String getAll(
             @RequestParam(name = PAGE_ATTRIBUTE, defaultValue = "0") int page,
             Model model) {
-                //map
+        // map
         final Map<String, Object> attributes = PageAttributesMapper.toAttributes(
                 userService.getAll(page, Constants.DEFUALT_PAGE_SIZE), this::toDto);
         model.addAllAttributes(attributes);
@@ -65,7 +64,7 @@ public class UserController {
         return USER_VIEW;
     }
 
-     @GetMapping("/edit/")
+    @GetMapping("/edit/")
     public String create(
             @RequestParam(name = PAGE_ATTRIBUTE, defaultValue = "0") int page,
             Model model) {
@@ -138,27 +137,23 @@ public class UserController {
         return modelMapper.map(entity, LineDto.class);
     }
 
-    @PostMapping("/edit/{id}/lines/{lineId}")
-    public UserDto addLine(@PathVariable(name = "id") Long id, @PathVariable(name = "lineId") Long lineId){
-        return toDto(userService.addLine(id, lineId));
-    }
-
     // @PostMapping("/edit/{id}/lines/{lineId}")
-    // public String addLine(
-    //     @PathVariable(name = "id") Long id,
-    //     @PathVariable(name = "lineId") Long lineId,
-    //     @RequestParam(name = PAGE_ATTRIBUTE, defaultValue = "0") int page,
-    //     RedirectAttributes redirectAttributes) {
-    //         userService.addLine(id, lineId);
-    //         redirectAttributes.addAttribute(PAGE_ATTRIBUTE, page);
-    //         return Constants.REDIRECT_VIEW + URL;
+    // public UserDto addLine(@PathVariable(name = "id") Long id, @PathVariable(name
+    // = "lineId") Long lineId){
+    // return toDto(userService.addLine(id, lineId));
     // }
 
-    @DeleteMapping("/edit/{id}/lines/{lineId}")
-    public UserDto removeLine(@PathVariable(name = "id") Long userId,
-            @PathVariable(name = "lineId") Long lineId) {
-        return toDto(userService.removeLine(userId, lineId));
+    @PostMapping("/edit/{id}/lines/{lineId}")
+    public String addLine(
+            @PathVariable(name = "id") Long id,
+            @PathVariable(name = "lineId") Long lineId,
+            RedirectAttributes redirectAttributes) {
+        userService.addLine(id, lineId);
+        redirectAttributes.addAttribute(PAGE_ATTRIBUTE);
+        return Constants.REDIRECT_VIEW + "/line";
     }
+
+    
 
     @DeleteMapping("/edit/{id}/lines/")
     public UserDto removeLines(@PathVariable(name = "id") Long userId) {
@@ -169,4 +164,43 @@ public class UserController {
     public List<LineDto> getLines(@PathVariable(name = "id") Long id) {
         return userService.getLines(id, 0, 5).stream().map(this::toLineDto).toList();
     }
+
+    @GetMapping("/{userId}/lines")
+    public String getUserLines(
+            @PathVariable(name = "userId") Long userId,
+            @RequestParam(name = PAGE_ATTRIBUTE, defaultValue = "0") int page,
+            Model model) {
+        if (userId <= 0) {
+            throw new IllegalArgumentException();
+        }
+        model.addAttribute("lines",
+                userService.getLines(userId, page, Constants.DEFUALT_PAGE_SIZE).stream().map(this::toLineDto).toList());
+        model.addAttribute(PAGE_ATTRIBUTE, page);
+        return "profile";
+    }
+
+    @DeleteMapping("/edit/{id}/lines/{lineId}")
+    public UserDto removeLine(@PathVariable(name = "id") Long userId,
+            @PathVariable(name = "lineId") Long lineId) {
+        return toDto(userService.removeLine(userId, lineId));
+    }
+
+
+    @PostMapping("/edit/{id}/lines/remove/{lineId}")
+    public String removeUserLine(
+            @PathVariable(name = "id") Long id,
+            @PathVariable(name = "lineId") Long lineId,
+            @RequestParam(name = PAGE_ATTRIBUTE, defaultValue = "0") int page,
+            Model model) {
+        if (id <= 0) {
+            throw new IllegalArgumentException();
+        }
+        userService.removeLine(id, lineId);
+        model.addAttribute("lines",
+                userService.getLines(id, page, Constants.DEFUALT_PAGE_SIZE).stream().map(this::toLineDto).toList());
+        model.addAttribute(PAGE_ATTRIBUTE, page);
+        return "profile";
+    }
+
+
 }

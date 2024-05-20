@@ -4599,3 +4599,7 @@ Caused by: org.h2.mvstore.MVStoreException: The file is locked: C:/Users/Egor/De
 	at org.h2.mvstore.SingleFileStore.open(SingleFileStore.java:81)
 	at org.h2.mvstore.MVStore.<init>(MVStore.java:286)
 	... 58 more
+2024-05-20 13:27:41.492733+04:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Синтаксическая ошибка в выражении SQL "[*]SEUSERS USERS LECT * FROM USERS_LINES"; ожидалось "SAVEPOINT, SCRIPT, SHUTDOWN"
+Syntax error in SQL statement "[*]SEUSERS USERS LECT * FROM USERS_LINES"; expected "SAVEPOINT, SCRIPT, SHUTDOWN"; SQL statement:
+SEUSERS USERS LECT * FROM USERS_LINES [42001-224]

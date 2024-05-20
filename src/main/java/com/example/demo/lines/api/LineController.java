@@ -82,30 +82,6 @@ public class LineController {
     // return PageDtoMapper.toDto(lineService.getAll(page, size), this::toDto);
     // }
 
-    // @GetMapping
-    // public String getAll(
-    // @RequestParam(name = PAGE_ATTRIBUTE, defaultValue = "0") int page,
-    // Model model) {
-    // final Map<String, Object> attributes = PageAttributesMapper.toAttributes(
-    // lineService.getAll(page, Constants.DEFUALT_PAGE_SIZE), this::toDto);
-    // model.addAllAttributes(attributes);
-    // model.addAttribute(PAGE_ATTRIBUTE, page);
-    // return LINE_VIEW;
-    // }
-
-    // @GetMapping
-    // public String getAll(Model model) {
-    // model.addAttribute("lines",
-    // lineService.getAll().stream()
-    // .map(this::toDto)
-    // .toList());
-    // model.addAttribute("items",
-    // itemService.getAll().stream()
-    // .map(this::toItemDto)
-    // .toList());
-    // return LINE_VIEW;
-    // }
-
     @GetMapping
     public String getAll(
             @RequestParam(name = "itemId", defaultValue = "0") Long itemId,
@@ -163,34 +139,6 @@ public class LineController {
         return Constants.REDIRECT_VIEW + URL;
     }
 
-    // @PostMapping("/edit/{id}")
-    // public String update(
-    // @PathVariable(name = "id") Long id,@ModelAttribute(name = LINE_ATTRIBUTE)
-    // @Valid LineDto line,
-    // BindingResult bindingResult,
-    // Model model, /*!*/WebRequest webRequest) {
-    // if (id <= 0) {
-    // throw new IllegalArgumentException();
-    // }
-
-    // if (bindingResult.hasErrors()) {
-    // return LINE_EDIT_VIEW;
-    // }
-    // if (id <= 0) {
-    // throw new IllegalArgumentException();
-    // }
-    // lineService.update(id, toEntity(line));
-
-    // // Получаем список всех item и сохраняем его в сессии
-    // List<ItemDto> items = itemService.getAll().stream()
-    // .map(this::toItemDto)
-    // .toList();
-    // webRequest.setAttribute("items", items, WebRequest.SCOPE_SESSION);
-
-    // model.addAttribute(LINE_ATTRIBUTE, toDto(lineService.get(id)));
-
-    // return LINE_EDIT_VIEW;
-    // }
 
     @GetMapping("/edit/{id}")
     public String update(

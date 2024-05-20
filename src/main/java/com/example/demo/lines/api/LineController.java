@@ -91,18 +91,42 @@ public class LineController {
     //     return LINE_VIEW;
     // }
 
+    // @GetMapping
+    // public String getAll(Model model) {
+    //     model.addAttribute("lines",
+    //             lineService.getAll().stream()
+    //                     .map(this::toDto)
+    //                     .toList());
+    //     model.addAttribute("items", 
+    //         itemService.getAll().stream()
+    //                     .map(this::toItemDto)
+    //                     .toList());
+    //     return LINE_VIEW;
+    // }
+
     @GetMapping
-    public String getAll(Model model) {
-        model.addAttribute("lines",
-                lineService.getAll().stream()
-                        .map(this::toDto)
-                        .toList());
-        model.addAttribute("items", 
-            itemService.getAll().stream()
-                        .map(this::toItemDto)
-                        .toList());
-        return LINE_VIEW;
+public String getAll(
+        @RequestParam(name = "itemId", defaultValue = "0") Long itemId,
+        Model model) {
+    List<LineDto> lines;
+    if (itemId == 0) {
+        // If no itemId is provided, get all lines
+        lines = lineService.getAll().stream()
+                .map(this::toDto)
+                .toList();
+    } else {
+        // If an itemId is provided, filter lines by item
+        lines = lineService.getAll(itemId).stream()
+                .map(this::toDto)
+                .toList();
     }
+    model.addAttribute("lines", lines);
+    model.addAttribute("items", 
+        itemService.getAll().stream()
+                    .map(this::toItemDto)
+                    .toList());
+    return LINE_VIEW;
+}
 
     @GetMapping("/{id}")
     public LineDto get(@PathVariable(name = "id") Long id) {

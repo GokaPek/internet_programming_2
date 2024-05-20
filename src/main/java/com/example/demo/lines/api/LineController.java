@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.core.api.PageAttributesMapper;
 import com.example.demo.core.configuration.Constants;
@@ -75,58 +76,59 @@ public class LineController {
      */
 
     // @GetMapping
-    // public PageDto<LineDto> getAll(@RequestParam(name = "page", defaultValue = "0") int page,
-    //         @RequestParam(name = "size", Constants.DEFUALT_PAGE_SIZE) int size) {
-    //     return PageDtoMapper.toDto(lineService.getAll(page, size), this::toDto);
+    // public PageDto<LineDto> getAll(@RequestParam(name = "page", defaultValue =
+    // "0") int page,
+    // @RequestParam(name = "size", Constants.DEFUALT_PAGE_SIZE) int size) {
+    // return PageDtoMapper.toDto(lineService.getAll(page, size), this::toDto);
     // }
 
     // @GetMapping
     // public String getAll(
-    //         @RequestParam(name = PAGE_ATTRIBUTE, defaultValue = "0") int page,
-    //         Model model) {
-    //     final Map<String, Object> attributes = PageAttributesMapper.toAttributes(
-    //             lineService.getAll(page, Constants.DEFUALT_PAGE_SIZE), this::toDto);
-    //     model.addAllAttributes(attributes);
-    //     model.addAttribute(PAGE_ATTRIBUTE, page);
-    //     return LINE_VIEW;
+    // @RequestParam(name = PAGE_ATTRIBUTE, defaultValue = "0") int page,
+    // Model model) {
+    // final Map<String, Object> attributes = PageAttributesMapper.toAttributes(
+    // lineService.getAll(page, Constants.DEFUALT_PAGE_SIZE), this::toDto);
+    // model.addAllAttributes(attributes);
+    // model.addAttribute(PAGE_ATTRIBUTE, page);
+    // return LINE_VIEW;
     // }
 
     // @GetMapping
     // public String getAll(Model model) {
-    //     model.addAttribute("lines",
-    //             lineService.getAll().stream()
-    //                     .map(this::toDto)
-    //                     .toList());
-    //     model.addAttribute("items", 
-    //         itemService.getAll().stream()
-    //                     .map(this::toItemDto)
-    //                     .toList());
-    //     return LINE_VIEW;
+    // model.addAttribute("lines",
+    // lineService.getAll().stream()
+    // .map(this::toDto)
+    // .toList());
+    // model.addAttribute("items",
+    // itemService.getAll().stream()
+    // .map(this::toItemDto)
+    // .toList());
+    // return LINE_VIEW;
     // }
 
     @GetMapping
-public String getAll(
-        @RequestParam(name = "itemId", defaultValue = "0") Long itemId,
-        Model model) {
-    List<LineDto> lines;
-    if (itemId == 0) {
-        // If no itemId is provided, get all lines
-        lines = lineService.getAll().stream()
-                .map(this::toDto)
-                .toList();
-    } else {
-        // If an itemId is provided, filter lines by item
-        lines = lineService.getAll(itemId).stream()
-                .map(this::toDto)
-                .toList();
+    public String getAll(
+            @RequestParam(name = "itemId", defaultValue = "0") Long itemId,
+            Model model) {
+        List<LineDto> lines;
+        if (itemId == 0) {
+            // If no itemId is provided, get all lines
+            lines = lineService.getAll().stream()
+                    .map(this::toDto)
+                    .toList();
+        } else {
+            // If an itemId is provided, filter lines by item
+            lines = lineService.getAll(itemId).stream()
+                    .map(this::toDto)
+                    .toList();
+        }
+        model.addAttribute("lines", lines);
+        model.addAttribute("items",
+                itemService.getAll().stream()
+                        .map(this::toItemDto)
+                        .toList());
+        return LINE_VIEW;
     }
-    model.addAttribute("lines", lines);
-    model.addAttribute("items", 
-        itemService.getAll().stream()
-                    .map(this::toItemDto)
-                    .toList());
-    return LINE_VIEW;
-}
 
     @GetMapping("/{id}")
     public LineDto get(@PathVariable(name = "id") Long id) {
@@ -139,9 +141,10 @@ public String getAll(
     }
 
     @GetMapping("/edit/")
-    public String create(Model model) { {
-        model.addAttribute(LINE_ATTRIBUTE, new LineDto());
-        return LINE_EDIT_VIEW;
+    public String create(Model model) {
+        {
+            model.addAttribute(LINE_ATTRIBUTE, new LineDto());
+            return LINE_EDIT_VIEW;
         }
     }
 
@@ -149,7 +152,7 @@ public String getAll(
     public String create(
             @ModelAttribute(name = LINE_ATTRIBUTE) @Valid LineDto line,
             BindingResult bindingResult,
-            Model model,/*!*/ SessionStatus sessionStatus) {
+            Model model, /* ! */ SessionStatus sessionStatus) {
         if (bindingResult.hasErrors()) {
             return LINE_EDIT_VIEW;
         }
@@ -160,33 +163,89 @@ public String getAll(
         return Constants.REDIRECT_VIEW + URL;
     }
 
-    @PostMapping("/edit/{id}")
+    // @PostMapping("/edit/{id}")
+    // public String update(
+    // @PathVariable(name = "id") Long id,@ModelAttribute(name = LINE_ATTRIBUTE)
+    // @Valid LineDto line,
+    // BindingResult bindingResult,
+    // Model model, /*!*/WebRequest webRequest) {
+    // if (id <= 0) {
+    // throw new IllegalArgumentException();
+    // }
+
+    // if (bindingResult.hasErrors()) {
+    // return LINE_EDIT_VIEW;
+    // }
+    // if (id <= 0) {
+    // throw new IllegalArgumentException();
+    // }
+    // lineService.update(id, toEntity(line));
+
+    // // Получаем список всех item и сохраняем его в сессии
+    // List<ItemDto> items = itemService.getAll().stream()
+    // .map(this::toItemDto)
+    // .toList();
+    // webRequest.setAttribute("items", items, WebRequest.SCOPE_SESSION);
+
+    // model.addAttribute(LINE_ATTRIBUTE, toDto(lineService.get(id)));
+
+    // return LINE_EDIT_VIEW;
+    // }
+
+    @GetMapping("/edit/{id}")
     public String update(
             @PathVariable(name = "id") Long id,
-            Model model, /*!*/WebRequest webRequest) {
+            Model model) {
         if (id <= 0) {
             throw new IllegalArgumentException();
         }
-        // Получаем список всех item
-
-         // Получаем список всех item и сохраняем его в сессии
-         List<ItemDto> items = itemService.getAll().stream()
-         .map(this::toItemDto)
-         .toList();
-        webRequest.setAttribute("items", items, WebRequest.SCOPE_SESSION);
-        
-
         model.addAttribute(LINE_ATTRIBUTE, toDto(lineService.get(id)));
-         
+
+        // Получение списка всех item и сохранение его в модель
+        List<ItemDto> items = itemService.getAll().stream()
+                .map(this::toItemDto)
+                .toList();
+        model.addAttribute("items", items);
+
         return LINE_EDIT_VIEW;
     }
 
-    private ItemDto toItemDto(ItemEntity entity) {
-         return modelMapper.map(entity, ItemDto.class);
+    @PostMapping("/edit/{id}")
+    public String update(
+            @PathVariable(name = "id") Long id,
+            @ModelAttribute(name = LINE_ATTRIBUTE) @Valid LineDto line,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            // Если есть ошибки валидации, возвращаем форму с сообщениями об ошибках
+            // И передаем id книги для редактирования
+            redirectAttributes.addFlashAttribute(LINE_ATTRIBUTE, line);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult." + LINE_ATTRIBUTE,
+                    bindingResult);
+            return Constants.REDIRECT_VIEW + "/line/edit/{id}";
+        }
+        if (id <= 0) {
+            throw new IllegalArgumentException();
+        }
+        lineService.update(id, toEntity(line));
+
+        // Получение списка всех item и сохранение его в сессии
+        List<ItemDto> items = itemService.getAll().stream()
+                .map(this::toItemDto)
+                .toList();
+        redirectAttributes.addFlashAttribute("items", items);
+
+        return Constants.REDIRECT_VIEW + URL;
     }
 
-    @DeleteMapping("/{id}")
-    public LineDto delete(@PathVariable(name = "id") Long id) {
-        return toDto(lineService.delete(id));
+    private ItemDto toItemDto(ItemEntity entity) {
+        return modelMapper.map(entity, ItemDto.class);
+    }
+
+    @PostMapping("/delete/{id}")
+    public String delete(
+            @PathVariable(name = "id") Long id) {
+        lineService.delete(id);
+        return Constants.REDIRECT_VIEW + URL;
     }
 }

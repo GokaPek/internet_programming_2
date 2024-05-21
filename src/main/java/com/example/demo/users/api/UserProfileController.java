@@ -1,5 +1,6 @@
 package com.example.demo.users.api;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -7,6 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -94,27 +96,75 @@ public class UserProfileController {
                 itemService.getAll().stream()
                         .map(this::toItemDto)
                         .toList());
-        // model.addAttribute(PROFILE_ATTRIBUTE,
-        //         new UserProfileDto(userService.getUserSubscriptions(userId).stream()
-        //                 .map(this::tSubscriptionDto)
-        //                 .toList()));
+        List<LineGroupedDto> linesGr = lineService.getTop(0, 5).stream().map(this::toGroupedDto).toList();
+        model.addAttribute("linesGr", linesGr);
         return PROFILE_VIEW;
+    }
+
+
+    @GetMapping("/user/{userId}/lines")
+    public String getUserLines(
+            @PathVariable(name = "userId") Long userId,
+            @RequestParam(name = PAGE_ATTRIBUTE, defaultValue = "0") int page,
+            Model model) {
+        if (userId <= 0) {
+            throw new IllegalArgumentException();
+        }
+        model.addAttribute("lines",
+                userService.getLines(userId, page, Constants.DEFUALT_PAGE_SIZE).stream().map(this::toLineDto).toList());
+        model.addAttribute(PAGE_ATTRIBUTE, page);
+
+        List<LineGroupedDto> linesGr = lineService.getTop(0, 5).stream().map(this::toGroupedDto).toList();
+        model.addAttribute("linesGr", linesGr);
+
+
+        return PROFILE_VIEW;
+    }
+
+    @PostMapping("/user/{id}/lines/{lineId}")
+    public String addLine(
+            @PathVariable(name = "id") Long id,
+            @PathVariable(name = "lineId") Long lineId,
+            RedirectAttributes redirectAttributes) {
+        userService.addLine(id, lineId);
+        redirectAttributes.addAttribute(PAGE_ATTRIBUTE);
+        return Constants.REDIRECT_VIEW + "/line";
+    }
+
+    @PostMapping("/user/{id}/lines/remove/{lineId}")
+    public String removeUserLine(
+            @PathVariable(name = "id") Long id,
+            @PathVariable(name = "lineId") Long lineId,
+            @RequestParam(name = PAGE_ATTRIBUTE, defaultValue = "0") int page,
+            Model model) {
+        if (id <= 0) {
+            throw new IllegalArgumentException();
+        }
+        userService.removeLine(id, lineId);
+        model.addAttribute("lines",
+                userService.getLines(id, page, Constants.DEFUALT_PAGE_SIZE).stream().map(this::toLineDto).toList());
+        model.addAttribute(PAGE_ATTRIBUTE, page);
+        return PROFILE_VIEW;
+    }
+
+    private LineDto toLineDto(LineEntity entity) {
+        return modelMapper.map(entity, LineDto.class);
     }
 
     // @PostMapping
     // public String saveProfile(
-    //         @ModelAttribute(name = PROFILE_ATTRIBUTE) @Valid UserProfileDto profile,
-    //         BindingResult bindResult,
-    //         Model model,
-    //         @AuthenticationPrincipal UserPrincipal principal) {
-    //     if (bindResult.hasErrors()) {
-    //         return PROFILE_VIEW;
-    //     }
-    //     userService.saveUserSubscriptions(principal.getId(),
-    //             profile.getSubscriptions().stream()
-    //                     .map(this::toSubscriptionWithStatus)
-    //                     .collect(Collectors.toSet()));
-    //     return Constants.REDIRECT_VIEW + "/";
+    // @ModelAttribute(name = PROFILE_ATTRIBUTE) @Valid UserProfileDto profile,
+    // BindingResult bindResult,
+    // Model model,
+    // @AuthenticationPrincipal UserPrincipal principal) {
+    // if (bindResult.hasErrors()) {
+    // return PROFILE_VIEW;
+    // }
+    // userService.saveUserSubscriptions(principal.getId(),
+    // profile.getSubscriptions().stream()
+    // .map(this::toSubscriptionWithStatus)
+    // .collect(Collectors.toSet()));
+    // return Constants.REDIRECT_VIEW + "/";
     // }
 
     @PostMapping("/delete/{id}")

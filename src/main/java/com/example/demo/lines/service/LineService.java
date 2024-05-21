@@ -30,6 +30,14 @@ public class LineService {
     }
 
     @Transactional(readOnly = true)
+    public List<LineEntity> getAll(long itemId, int page, int size) {
+        if (itemId <= 0L) {
+            return repository.findAll();
+        }
+        return repository.findByItemId(itemId, PageRequest.of(page, size));
+    }
+
+    @Transactional(readOnly = true)
     public Page<LineEntity> getAll(int page, int size) {
         return repository.findAll(PageRequest.of(page, size));
     }

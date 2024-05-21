@@ -101,6 +101,13 @@ public class UserProfileController {
         return PROFILE_VIEW;
     }
 
+    @GetMapping("/profile")
+    public String profile(Model model){
+        List<LineGroupedDto> linesGr = lineService.getTop(0, 5).stream().map(this::toGroupedDto).toList();
+        model.addAttribute("linesGr", linesGr);
+        return PROFILE_VIEW;
+    }
+
 
     @GetMapping("/user/{userId}/lines")
     public String getUserLines(
@@ -120,7 +127,7 @@ public class UserProfileController {
 
         return PROFILE_VIEW;
     }
-
+    
     @PostMapping("/user/{id}/lines/{lineId}")
     public String addLine(
             @PathVariable(name = "id") Long id,
@@ -146,6 +153,7 @@ public class UserProfileController {
         model.addAttribute(PAGE_ATTRIBUTE, page);
         return PROFILE_VIEW;
     }
+
 
     private LineDto toLineDto(LineEntity entity) {
         return modelMapper.map(entity, LineDto.class);

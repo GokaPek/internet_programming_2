@@ -23,6 +23,8 @@ public interface LineRepository extends CrudRepository<LineEntity, Long>, Paging
 
     List<LineEntity> findAll();
 
+    List<LineEntity> findByItemId(long itemId, Pageable page);
+
     List<LineEntity> findByItemId(long itemId);
 
     // получить топ 5 самых залайканных книг

@@ -85,16 +85,17 @@ public class LineController {
     @GetMapping
     public String getAll(
             @RequestParam(name = "itemId", defaultValue = "0") Long itemId,
+            @RequestParam(name=PAGE_ATTRIBUTE, defaultValue = "0") int page,
             Model model) {
         List<LineDto> lines;
         if (itemId == 0) {
             // If no itemId is provided, get all lines
-            lines = lineService.getAll().stream()
+            lines = lineService.getAll(page, Constants.DEFUALT_PAGE_SIZE).stream()
                     .map(this::toDto)
                     .toList();
         } else {
             // If an itemId is provided, filter lines by item
-            lines = lineService.getAll(itemId).stream()
+            lines = lineService.getAll(itemId, page, Constants.DEFUALT_PAGE_SIZE).stream()
                     .map(this::toDto)
                     .toList();
         }

@@ -3,6 +3,7 @@ package com.example.demo.lines.service;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,31 +22,48 @@ public class LineService {
     }
 
     // возможно стоит сделать как в примере TypeService
-    @Transactional(readOnly = true)
-    public List<LineEntity> getAll(long itemId) {
-        if (itemId <= 0L) {
-            return repository.findAll();
-        }
-        return repository.findByItemId(itemId);
-    }
+    // @Transactional(readOnly = true)
+    // public List<LineEntity> getAll(long itemId) {
+    //     if (itemId <= 0L) {
+    //         return repository.findAll();
+    //     }
+    //     return repository.findByItemId(itemId);
+    // }
 
     @Transactional(readOnly = true)
-    public List<LineEntity> getAll(long itemId, int page, int size) {
+    public Page<LineEntity> getAll(long itemId, int page, int size) {
+        final Pageable pageRequest = PageRequest.of(page, size);
         if (itemId <= 0L) {
-            return repository.findAll();
+            return repository.findAll(pageRequest);
         }
-        return repository.findByItemId(itemId, PageRequest.of(page, size));
+        return repository.findByItemId(itemId, pageRequest);
     }
+
+    // @Transactional(readOnly = true)
+    // public List<LineEntity> getAll(long itemId, int page, int size) {
+    //     if (itemId <= 0L) {
+    //         return repository.findAll();
+    //     }
+    //     return repository.findByItemId(itemId, PageRequest.of(page, size));
+    // }
+
+    // @Transactional(readOnly = true)
+    // public Page<LineEntity> getAll(long itemId, int page, int size) {
+    //     if (itemId <= 0L) {
+    //         return repository.findAll();
+    //     }
+    //     return repository.findByItemId(itemId, PageRequest.of(page, size));
+    // }
 
     @Transactional(readOnly = true)
     public Page<LineEntity> getAll(int page, int size) {
         return repository.findAll(PageRequest.of(page, size));
     }
 
-    @Transactional(readOnly = true)
-    public List<LineEntity> getAll() {
-        return repository.findAll();
-    }
+    // @Transactional(readOnly = true)
+    // public List<LineEntity> getAll() {
+    //     return repository.findAll();
+    // }
 
     @Transactional
     public LineEntity get(Long id) {

@@ -75,7 +75,7 @@ class UseServiceTest {
     void removeData() {
         userService.getAll().forEach(item -> userService.delete(item.getId()));
 
-        lineService.getAll(0).forEach(item -> lineService.delete(item.getId()));
+        //lineService.getAll(0).forEach(item -> lineService.delete(item.getId()));
         itemService.getAll().forEach(item -> itemService.delete(item.getId()));
     }
 

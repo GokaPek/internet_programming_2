@@ -41,7 +41,7 @@ public class LineController {
     private static final String LINE_VIEW = "line";
     private static final String LINE_EDIT_VIEW = "line-edit";
     private static final String LINE_ATTRIBUTE = "line";
-    private static final String PAGE_ATTRIBUTE = "line";
+    private static final String PAGE_ATTRIBUTE = "page";
 
     private final LineService lineService;
     private final ItemService itemService;
@@ -87,23 +87,20 @@ public class LineController {
             @RequestParam(name = "itemId", defaultValue = "0") Long itemId,
             @RequestParam(name=PAGE_ATTRIBUTE, defaultValue = "0") int page,
             Model model) {
-        List<LineDto> lines;
+        final Map<String, Object> attributes;
         if (itemId == 0) {
             // If no itemId is provided, get all lines
-            lines = lineService.getAll(page, Constants.DEFUALT_PAGE_SIZE).stream()
-                    .map(this::toDto)
-                    .toList();
+            attributes = PageAttributesMapper.toAttributes(lineService.getAll(page, Constants.DEFUALT_PAGE_SIZE), this::toDto);
         } else {
             // If an itemId is provided, filter lines by item
-            lines = lineService.getAll(itemId, page, Constants.DEFUALT_PAGE_SIZE).stream()
-                    .map(this::toDto)
-                    .toList();
+            attributes = PageAttributesMapper.toAttributes(lineService.getAll(itemId, page, Constants.DEFUALT_PAGE_SIZE), this::toDto);
         }
-        model.addAttribute("lines", lines);
-        model.addAttribute("items",
+        model.addAllAttributes(attributes);
+        model.addAttribute("types",
                 itemService.getAll().stream()
                         .map(this::toItemDto)
                         .toList());
+        model.addAttribute(PAGE_ATTRIBUTE, page);
         return LINE_VIEW;
     }
 

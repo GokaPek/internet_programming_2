@@ -32,7 +32,7 @@ public class UserController {
     public static final String URL = Constants.ADMIN_PREFIX + "/user";
     private static final String USER_VIEW = "user";
     private static final String USER_EDIT_VIEW = "user-edit";
-    private static final String PAGE_ATTRIBUTE = "user";
+    private static final String PAGE_ATTRIBUTE = "page";
     private static final String USER_ATTRIBUTE = "user";
     private static final String LINE_VIEW = "line";
 

@@ -34,20 +34,20 @@ import com.example.demo.lines.service.LineService;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping(LineController.URL)
+@RequestMapping(BookController.URL)
 @SessionAttributes("types")
-public class LineController {
-    public static final String URL = "/line";
-    private static final String LINE_VIEW = "line";
-    private static final String LINE_EDIT_VIEW = "line-edit";
-    private static final String LINE_ATTRIBUTE = "line";
+public class BookController {
+    public static final String URL = "/book";
+    private static final String LINE_VIEW = "book";
+    private static final String LINE_EDIT_VIEW = "book-edit";
+    private static final String LINE_ATTRIBUTE = "item";
     private static final String PAGE_ATTRIBUTE = "page";
 
     private final LineService lineService;
     private final ItemService itemService;
     private final ModelMapper modelMapper;
 
-    public LineController(LineService lineService, ItemService itemService, ModelMapper modelMapper) {
+    public BookController(LineService lineService, ItemService itemService, ModelMapper modelMapper) {
         this.lineService = lineService;
         this.itemService = itemService;
         this.modelMapper = modelMapper;
@@ -66,21 +66,6 @@ public class LineController {
         entity.setItem(itemService.get(dto.getItemId()));
         return entity;
     }
-
-    /*
-     * @GetMapping
-     * public List<LineDto> getAll(@RequestParam(name = "itemId", defaultValue =
-     * "0") Long itemId) {
-     * return lineService.getAll(itemId).stream().map(this::toDto).toList();
-     * }
-     */
-
-    // @GetMapping
-    // public PageDto<LineDto> getAll(@RequestParam(name = "page", defaultValue =
-    // "0") int page,
-    // @RequestParam(name = "size", Constants.DEFUALT_PAGE_SIZE) int size) {
-    // return PageDtoMapper.toDto(lineService.getAll(page, size), this::toDto);
-    // }
 
     @GetMapping
     public String getAll(
@@ -194,4 +179,14 @@ public class LineController {
         lineService.delete(id);
         return Constants.REDIRECT_VIEW + URL;
     }
+
+
+    @GetMapping("/book-view/{id}")
+public String viewBook(@PathVariable("id") Long id, Model model) {
+    LineEntity line = lineService.get(id);
+    ItemEntity item = itemService.get(line.getItem().getId()); // Получаем ItemEntity по itemId
+    model.addAttribute("line", line);
+    model.addAttribute("itemName", item.getName()); // Добавляем имя типа в модель
+    return "book-view";
+}
 }

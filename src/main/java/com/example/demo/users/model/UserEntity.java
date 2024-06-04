@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.example.demo.core.model.BaseEntity;
-import com.example.demo.lines.model.LineEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,10 +17,6 @@ import jakarta.persistence.Table;
 public class UserEntity extends BaseEntity {
     @Column(nullable = false, unique = true, length = 20)
     private String login;
-
-    @ManyToMany()
-    @OrderBy("id ASC")
-    private Set<LineEntity> lines = new HashSet<>();
 
     private String password;
     private UserRole role;
@@ -55,9 +50,6 @@ public class UserEntity extends BaseEntity {
         this.role = role;
     }
 
-    public Set<LineEntity> getLines() {
-        return lines;
-    }
 
     public String getPassword() {
         return password;
@@ -67,22 +59,9 @@ public class UserEntity extends BaseEntity {
         this.password = password;
     }
 
-    public void addLine(LineEntity line) {
-        /*
-         * if (order.getUser() != this) {
-         * order.setUser(this);
-         * }
-         */
-        lines.add(line);
-    }
-
-    public void removeLine(LineEntity lineEntity) {
-        this.lines.remove(lineEntity);
-    }
-
     @Override
     public int hashCode() {
-        return Objects.hash(id, login, role, lines);
+        return Objects.hash(id, login, role);
     }
 
     @Override
@@ -93,7 +72,6 @@ public class UserEntity extends BaseEntity {
             return false;
         UserEntity other = (UserEntity) obj;
         return Objects.equals(other.getId(), id)
-                && Objects.equals(other.getLogin(), login)
-                && Objects.equals(other.getLines(), lines);
+                && Objects.equals(other.getLogin(), login);
     }
 }

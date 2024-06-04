@@ -4,11 +4,15 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import com.example.demo.applications.model.ApplicationEntity;
 import com.example.demo.core.model.BaseEntity;
+import com.example.demo.reviews.model.ReviewEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 
@@ -20,6 +24,13 @@ public class UserEntity extends BaseEntity {
 
     private String password;
     private UserRole role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OrderBy("id ASC")
+    private final Set<ApplicationEntity> applications = new HashSet<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OrderBy("id ASC")
+    private final Set<ReviewEntity> reviews = new HashSet<>();
 
     public UserEntity() {
     }
@@ -57,6 +68,21 @@ public class UserEntity extends BaseEntity {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Set<ReviewEntity> getReviews() {
+        return reviews;
+    }
+
+    public Set<ApplicationEntity> getApplications() {
+        return applications;
+    }
+
+    public void addReview(ReviewEntity review) {
+        if (review.getUser() != this) {
+            review.setUser(this);
+        }
+        reviews.add(review);
     }
 
     @Override

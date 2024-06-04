@@ -85,7 +85,6 @@ public class UserProfileController {
             RedirectAttributes redirectAttributes,
             @AuthenticationPrincipal UserPrincipal principal) {
         redirectAttributes.addAttribute(PAGE_ATTRIBUTE, page);
-        userService.removeLine(principal.getId(), id);
         return Constants.REDIRECT_VIEW + "/";
     }
 }

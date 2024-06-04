@@ -20,8 +20,6 @@ import org.springframework.util.StringUtils;
 import com.example.demo.core.configuration.Constants;
 import com.example.demo.core.error.NotFoundException;
 import com.example.demo.core.security.UserPrincipal;
-import com.example.demo.lines.model.LineEntity;
-import com.example.demo.lines.service.LineService;
 import com.example.demo.users.model.UserEntity;
 import com.example.demo.users.model.UserRole;
 import com.example.demo.users.repository.UserRepository;
@@ -29,15 +27,12 @@ import com.example.demo.users.repository.UserRepository;
 @Service
 public class UserService implements UserDetailsService{
     private final UserRepository repository;
-    private final LineService lineService;
     private final PasswordEncoder passwordEncoder;
 
     public UserService(
             UserRepository repository,
-            LineService lineService,
             PasswordEncoder passwordEncoder) {
         this.repository = repository;
-        this.lineService = lineService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -64,26 +59,6 @@ public class UserService implements UserDetailsService{
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException(UserEntity.class, id));
     }
-
-    // @Transactional
-    // public UserEntity create(UserEntity entity) {
-    //     if (entity == null) {
-    //         throw new IllegalArgumentException("Entity is null");
-    //     }
-    //     checkLogin(entity.getLogin());
-    //     repository.save(entity);
-
-    //     // возможно понадобится аналогия с добавлением lines книг
-    //     /*
-    //      * subscriptionService.getAll().forEach(subscription -> {
-    //      * final UserSubscriptionEntity userSubscription = new
-    //      * UserSubscriptionEntity(entity, subscription, true);
-    //      * userSubscription.setUser(entity);
-    //      * userSubscription.setSubscription(subscription);
-    //      * });
-    //      */
-    //     return repository.save(entity);
-    // }
 
     @Transactional
     public UserEntity create(UserEntity entity) {
@@ -115,54 +90,6 @@ public class UserService implements UserDetailsService{
         repository.delete(existsEntity);
         return existsEntity;
     }
-
-    // возможно надо будет тут книжки доработать
-
-    @Transactional
-    public UserEntity addLine(long id, long lineId) {
-        final UserEntity existsEntity = get(id);
-        LineEntity line = lineService.get(lineId);
-        existsEntity.addLine(line);
-        repository.save(existsEntity);
-        return existsEntity;
-    }
-
-    @Transactional
-    public UserEntity removeLine(long userId, long lineId) {
-        final UserEntity existsEntity = get(userId);
-        LineEntity line = lineService.get(lineId);
-        existsEntity.removeLine(line);
-        return repository.save(existsEntity);
-    }
-
-    @Transactional
-    public UserEntity removeAllLines(long userId) {
-        final UserEntity user = get(userId);
-        user.getLines().clear();
-        return repository.save(user);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<LineEntity> getLines(long id, int page, int size) {
-        UserEntity user = get(id);
-    List<LineEntity>
-        /*return*/ lines = user.getLines().stream().toList();
-        Pageable pageable = PageRequest.of(page, size);
-    int start = (int) pageable.getOffset();
-    int end = (start + pageable.getPageSize()) > lines.size() ? lines.size() : (start + pageable.getPageSize());
-
-    return new PageImpl<>(lines.subList(start, end), pageable, lines.size());
-    }
-    // @Transactional(readOnly = true)
-    // public Page<LineEntity> getAll(long userId, int page, int size) {
-    //     final Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
-    //     return get(userId).getLines().stream().toList();
-    //     if (typeId <= 0L) {
-    //         return repository.findByUserId(userId, pageable);
-    //     } else {
-    //         return repository.findByUserIdAndTypeId(userId, typeId, pageable);
-    //     }
-    // }
 
     @Override
     @Transactional(readOnly = true)

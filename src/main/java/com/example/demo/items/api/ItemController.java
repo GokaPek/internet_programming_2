@@ -111,12 +111,6 @@ public class ItemController {
         return Constants.REDIRECT_VIEW + URL;
     }
 
-
-    // @PutMapping("/{id}")
-    // public ItemDto update(@PathVariable(name = "id") Long id, @RequestBody ItemDto dto) {
-    //     return toDto(itemService.update(id, toEntity(dto)));
-    // }
-
 @GetMapping("/edit/{id}")
     public String update(
             @PathVariable(name = "id") Long id,

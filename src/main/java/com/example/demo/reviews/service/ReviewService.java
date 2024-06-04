@@ -2,7 +2,6 @@ package com.example.demo.reviews.service;
 
 import com.example.demo.core.error.NotFoundException;
 import com.example.demo.reviews.model.ReviewEntity;
-// import com.example.demo.reviews.model.ReviewGrouped;
 import com.example.demo.reviews.repository.ReviewRepository;
 import com.example.demo.users.model.UserEntity;
 import com.example.demo.users.service.UserService;
@@ -34,6 +33,9 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public Page<ReviewEntity> getAll(long userId, int page, int size) {
         final Pageable pageRequest = PageRequest.of(page, size);
+        if (userId <= 0){
+            return repository.findAll(pageRequest);
+        }
         userService.get(userId);
         return repository.findByUserId(userId, pageRequest);
     }
@@ -42,6 +44,12 @@ public class ReviewService {
     public ReviewEntity get(long userId, long id) {
         userService.get(userId);
         return repository.findOneByUserIdAndId(userId, id)
+                .orElseThrow(() -> new NotFoundException(ReviewEntity.class, id));
+    }
+
+    @Transactional(readOnly = true)
+    public ReviewEntity get(long id) {
+        return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ReviewEntity.class, id));
     }
 
@@ -56,17 +64,15 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewEntity update(long userId, long id, ReviewEntity entity) {
-        userService.get(userId);
-        final ReviewEntity existsEntity = get(userId, id);
+    public ReviewEntity update(long id, ReviewEntity entity) {
+        final ReviewEntity existsEntity = get(id);
         existsEntity.setText(entity.getText());
         return repository.save(existsEntity);
     }
 
     @Transactional
-    public ReviewEntity delete(long userId, long id) {
-        userService.get(userId);
-        final ReviewEntity existsEntity = get(userId, id);
+    public ReviewEntity delete(long id) {
+        final ReviewEntity existsEntity = get(id);
         repository.delete(existsEntity);
         return existsEntity;
     }

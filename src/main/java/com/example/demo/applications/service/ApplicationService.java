@@ -27,7 +27,9 @@ public class ApplicationService {
 
     @Transactional(readOnly = true)
     public List<ApplicationEntity> getAll(long userId, long itemId) {
-        userService.get(userId);
+        if (userId > 0L) {
+            userService.get(userId);
+        }
         if (itemId <= 0L) {
             return repository.findByUserId(userId);
         } else {
@@ -38,17 +40,27 @@ public class ApplicationService {
     @Transactional(readOnly = true)
     public Page<ApplicationEntity> getAll(long userId, long itemId, int page, int size) {
         final Pageable pageRequest = PageRequest.of(page, size);
-        userService.get(userId);
-        if (itemId <= 0L) {
-            return repository.findByUserId(userId, pageRequest);
+        // if (userId > 0L) {
+        //     userService.get(userId);
+        // }
+        if (itemId > 0L & userId > 0L) {
+            return repository.findByUserIdAndItemId(userId, itemId, pageRequest);
+            
         }
-        return repository.findByUserIdAndItemId(userId, itemId, pageRequest);
+        //return repository.findByUserId(userId, pageRequest);
+        return repository.findAll(pageRequest);
     }
 
     @Transactional(readOnly = true)
     public ApplicationEntity get(long userId, long id) {
         userService.get(userId);
         return repository.findOneByUserIdAndId(userId, id);
+                //.orElseThrow(() -> new NotFoundException(ApplicationEntity.class, id));
+    }
+
+    @Transactional(readOnly = true)
+    public ApplicationEntity get(long id) {
+        return repository.findOneById(id);
                 //.orElseThrow(() -> new NotFoundException(ApplicationEntity.class, id));
     }
 
@@ -76,6 +88,14 @@ public class ApplicationService {
     public ApplicationEntity delete(long userId, long id) {
         userService.get(userId);
         final ApplicationEntity existsEntity = get(userId, id);
+        repository.delete(existsEntity);
+        return existsEntity;
+    }
+
+    @Transactional
+    public ApplicationEntity delete(long id) {
+        //userService.get(userId);
+        final ApplicationEntity existsEntity = get(id);
         repository.delete(existsEntity);
         return existsEntity;
     }

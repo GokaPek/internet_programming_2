@@ -120,7 +120,7 @@ public class ItemController {
         }
         model.addAttribute(ITEM_ATTRIBUTE, toDto(itemService.get(id)));
 
-        // Получение списка всех item и сохранение его в модель
+        // Получение списка всех type и сохранение его в модель
         List<TypeDto> types = typeService.getAll().stream()
                 .map(this::toTypeDto)
                 .toList();

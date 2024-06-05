@@ -12,7 +12,9 @@ import com.example.demo.reviews.model.ReviewEntity;;
 
 public interface ApplicationRepository extends CrudRepository<ApplicationEntity, Long> {
     //Optional<ApplicationEntity> findByNameIgnoreCase(String name);
+    Page<ApplicationEntity> findAll(Pageable pageable);
 
+    ApplicationEntity findOneById(Long id);
     List<ApplicationEntity> findByUserId(long userId);
     Page<ApplicationEntity> findByUserId(long userId, Pageable pageable);
     List<ApplicationEntity> findByUserIdAndItemId(long userId, long itemId);

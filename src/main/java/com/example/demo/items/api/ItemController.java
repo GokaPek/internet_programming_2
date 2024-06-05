@@ -22,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.demo.core.api.PageAttributesMapper;
 import com.example.demo.core.configuration.Constants;
 import com.example.demo.items.model.ItemEntity;
+import com.example.demo.items.model.ItemGrouped;
 import com.example.demo.items.service.ItemService;
 import com.example.demo.types.api.TypeDto;
 import com.example.demo.types.model.TypeEntity;
@@ -52,33 +53,35 @@ public class ItemController {
         return modelMapper.map(entity, ItemDto.class);
     }
 
+    private ItemGroupedDto toGroupedDto(ItemGrouped entity) {
+        return modelMapper.map(entity, ItemGroupedDto.class);
+    }
+
+    private TypeDto toTypeDto(TypeEntity entity) {
+        return modelMapper.map(entity, TypeDto.class);
+    }
+
     private ItemEntity toEntity(ItemDto dto) {
         final ItemEntity entity = modelMapper.map(dto, ItemEntity.class);
         entity.setType(typeService.get(dto.getTypeId()));
         return entity;
     }
 
-
     @GetMapping
-    public String getAll(@RequestParam(name = "typeId", defaultValue = "0") Long typeId, @RequestParam(name = PAGE_ATTRIBUTE, defaultValue = "0") int page, Model model)
-        {
-            final Map<String, Object> attributes = PageAttributesMapper.toAttributes(itemService.getAll(typeId, page, Constants.DEFUALT_PAGE_SIZE), this::toDto);
-            model.addAllAttributes(attributes);
-            model.addAttribute(PAGE_ATTRIBUTE, page);
+    public String getAll(@RequestParam(name = "typeId", defaultValue = "0") Long typeId,
+            @RequestParam(name = PAGE_ATTRIBUTE, defaultValue = "0") int page, Model model) {
+        final Map<String, Object> attributes = PageAttributesMapper
+                .toAttributes(itemService.getAll(typeId, page, Constants.DEFUALT_PAGE_SIZE), this::toDto);
+        model.addAllAttributes(attributes);
+        model.addAttribute(PAGE_ATTRIBUTE, page);
 
-            model.addAttribute("types",
+        model.addAttribute("types",
                 typeService.getAll().stream()
                         .map(this::toTypeDto)
                         .toList());
 
-            return ITEM_VIEW;
-        }
-
-
-        private TypeDto toTypeDto(TypeEntity entity) {
-            return modelMapper.map(entity, TypeDto.class);
-        }
-
+        return ITEM_VIEW;
+    }
 
     @GetMapping("/{id}")
     public ItemDto get(@PathVariable(name = "id") Long id) {
@@ -91,9 +94,9 @@ public class ItemController {
             model.addAttribute(ITEM_ATTRIBUTE, new ItemDto());
 
             model.addAttribute("types",
-                typeService.getAll().stream()
-                        .map(this::toTypeDto)
-                        .toList());
+                    typeService.getAll().stream()
+                            .map(this::toTypeDto)
+                            .toList());
 
             return ITEM_EDIT_VIEW;
         }
@@ -111,7 +114,7 @@ public class ItemController {
         return Constants.REDIRECT_VIEW + URL;
     }
 
-@GetMapping("/edit/{id}")
+    @GetMapping("/edit/{id}")
     public String update(
             @PathVariable(name = "id") Long id,
             Model model) {
@@ -141,7 +144,7 @@ public class ItemController {
             redirectAttributes.addFlashAttribute(ITEM_ATTRIBUTE, line);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult." + ITEM_ATTRIBUTE,
                     bindingResult);
-                    return ITEM_EDIT_VIEW;
+            return ITEM_EDIT_VIEW;
         }
         if (id <= 0) {
             throw new IllegalArgumentException();
@@ -162,5 +165,10 @@ public class ItemController {
             @PathVariable(name = "id") Long id) {
         itemService.delete(id);
         return Constants.REDIRECT_VIEW + URL;
+    }
+
+    @GetMapping("/top")
+    public List<ItemGroupedDto> getTop() {
+        return itemService.getTop(0, 5).stream().map(this::toGroupedDto).toList();
     }
 }

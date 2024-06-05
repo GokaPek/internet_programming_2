@@ -12,8 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.core.error.NotFoundException;
 import com.example.demo.items.model.ItemEntity;
+import com.example.demo.items.model.ItemGrouped;
 import com.example.demo.items.repository.ItemRepository;
-import com.example.demo.types.model.TypeEntity;
+import com.example.demo.items.model.ItemGrouped;
 
 @Service
 public class ItemService {
@@ -71,5 +72,10 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemEntity> getProductWherePriceMoreThen(int value) {
         return repository.findWherePriceMoreThen(value);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ItemGrouped> getTop(int page, int size) {
+        return repository.findTop5PopularServices(PageRequest.of(page, size));
     }
 }

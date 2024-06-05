@@ -9,6 +9,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import com.example.demo.items.model.ItemEntity;
+import com.example.demo.items.model.ItemGrouped;
 
 public interface ItemRepository
         extends CrudRepository<ItemEntity, Long>, PagingAndSortingRepository<ItemEntity, Long> {
@@ -19,4 +20,11 @@ public interface ItemRepository
 
     @Query("select p from ItemEntity p where p.price > ?1")
     List<ItemEntity> findWherePriceMoreThen(int value);
+
+    @Query("SELECT a.item, COUNT(a) as applicationCount, a.item.id as id, a.item.name as name " +
+            "FROM ApplicationEntity a " +
+            "JOIN ItemEntity it on a.item.id = it.id " +
+            "GROUP BY a.item.id " +
+            "ORDER BY applicationCount DESC")
+    List<ItemGrouped> findTop5PopularServices(Pageable pageable);
 }

@@ -95,46 +95,12 @@ public class ApplicationController {
         }
 
 
-    @GetMapping("/{id}")
-    public ApplicationDto get(
-            @PathVariable(name = "user") Long userId,
-            @PathVariable(name = "id") Long id) {
-        return toDto(applicationService.get(userId, id));
-    }
-
-    @PostMapping
-    public ApplicationDto create(
-            @PathVariable(name = "user") Long userId,
-            @RequestBody @Valid ApplicationDto dto) {
-        return toDto(applicationService.create(userId, toEntity(dto)));
-    }
-
-    @PutMapping("/{id}")
-    public ApplicationDto update(
-            @PathVariable(name = "user") Long userId,
-            @PathVariable(name = "id") Long id,
-            @RequestBody @Valid ApplicationDto dto) {
-        return toDto(applicationService.update(userId, id, toEntity(dto)));
-    }
-
-    @DeleteMapping("/{id}")
-    public ApplicationDto delete(
-            @PathVariable(name = "user") Long userId,
-            @PathVariable(name = "id") Long id) {
-        return toDto(applicationService.delete(userId, id));
-    }
-
 
 
     @GetMapping("/edit/")
     public String create(Model model) {
         {
             model.addAttribute(APP_ATTRIBUTE, new ApplicationDto());
-
-            // model.addAttribute("types",
-            //     typeService.getAll().stream()
-            //             .map(this::toTypeDto)
-            //             .toList());
 
             return APP_EDIT_VIEW;
         }
@@ -152,7 +118,7 @@ public class ApplicationController {
         return Constants.REDIRECT_VIEW + URL;
     }
 
-@GetMapping("/edit/{id}")
+    @GetMapping("/edit/{id}")
     public String update(
             @PathVariable(name = "id") Long id,
             Model model) {
@@ -160,12 +126,6 @@ public class ApplicationController {
             throw new IllegalArgumentException();
         }
         model.addAttribute(APP_ATTRIBUTE, toDto(applicationService.get(id)));
-
-        // Получение списка всех item и сохранение его в модель
-        // List<TypeDto> types = typeService.getAll().stream()
-        //         .map(this::toTypeDto)
-        //         .toList();
-        // model.addAttribute("types", types);
 
         return APP_EDIT_VIEW;
     }
@@ -188,12 +148,6 @@ public class ApplicationController {
             throw new IllegalArgumentException();
         }
         applicationService.update(line.getUserId(), line.getId(), toEntity(line));
-
-        // Получение списка всех type и сохранение его в сессии
-        // List<TypeDto> types = typeService.getAll().stream()
-        //         .map(this::toTypeDto)
-        //         .toList();
-        // redirectAttributes.addFlashAttribute("types", types);
 
         return Constants.REDIRECT_VIEW + URL;
     }

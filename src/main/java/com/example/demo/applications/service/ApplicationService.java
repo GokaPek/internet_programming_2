@@ -44,9 +44,13 @@ public class ApplicationService {
         //     userService.get(userId);
         // }
         if (itemId > 0L & userId > 0L) {
-            return repository.findByUserIdAndItemId(userId, itemId, pageRequest);
-            
+            return repository.findByUserIdAndItemId(userId, itemId, pageRequest);   
         }
+        
+        if (userId > 0L) {
+            return repository.findByUserId(userId, pageRequest);   
+        }
+
         //return repository.findByUserId(userId, pageRequest);
         return repository.findAll(pageRequest);
     }

@@ -1,4 +1,4 @@
-package com.example.demo.reviews.api;
+package com.example.demo.users.api;
 
 import java.util.List;
 import java.util.Map;
@@ -24,6 +24,7 @@ import com.example.demo.core.api.PageDto;
 import com.example.demo.core.api.PageDtoMapper;
 import com.example.demo.core.configuration.Constants;
 import com.example.demo.items.api.ItemDto;
+import com.example.demo.reviews.api.ReviewDto;
 import com.example.demo.reviews.model.ReviewEntity;
 import com.example.demo.reviews.service.ReviewService;
 import com.example.demo.types.api.TypeDto;
@@ -35,11 +36,11 @@ import com.example.demo.users.service.UserService;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping(ReviewController.URL)
-public class ReviewController {
-    public static final String URL = Constants.ADMIN_PREFIX + "/review";
-    private static final String REVIEW_VIEW = "review";
-    private static final String REVIEW_EDIT_VIEW = "review-edit";
+@RequestMapping(UserReviewController.URL)
+public class UserReviewController {
+    public static final String URL = "/reviews";
+    private static final String REVIEW_VIEW = "reviews";
+    private static final String REVIEW_EDIT_VIEW = "reviews-edit";
     private static final String PAGE_ATTRIBUTE = "page";
     private static final String REVIEW_ATTRIBUTE = "item";
 
@@ -47,7 +48,7 @@ public class ReviewController {
     private final UserService userService;
     private final ModelMapper modelMapper;
 
-    public ReviewController(ReviewService reviewService, UserService userService, ModelMapper modelMapper) {
+    public UserReviewController(ReviewService reviewService, UserService userService, ModelMapper modelMapper) {
         this.reviewService = reviewService;
         this.modelMapper = modelMapper;
         this.userService = userService;
@@ -103,12 +104,6 @@ public class ReviewController {
     public String create(Model model) {
         {
             model.addAttribute(REVIEW_ATTRIBUTE, new ReviewDto());
-
-            // model.addAttribute("types",
-            //     typeService.getAll().stream()
-            //             .map(this::toTypeDto)
-            //             .toList());
-
             return REVIEW_EDIT_VIEW;
         }
     }
@@ -157,11 +152,6 @@ public class ReviewController {
             throw new IllegalArgumentException();
         }
         reviewService.update(id, toEntity(line));
-
-        // List<TypeDto> types = typeService.getAll().stream()
-        //         .map(this::toTypeDto)
-        //         .toList();
-        // redirectAttributes.addFlashAttribute("types", types);
 
         return Constants.REDIRECT_VIEW + URL;
     }

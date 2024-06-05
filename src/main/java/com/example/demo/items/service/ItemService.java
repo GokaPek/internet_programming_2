@@ -38,6 +38,12 @@ public class ItemService {
                 .orElseThrow(() -> new NotFoundException(ItemEntity.class, id));
     }
 
+    public String getItemName(Long id) {
+        return repository.findById(id)
+                .map(ItemEntity::getName) // Извлекаем имя услуги из сущности
+                .orElseThrow(() -> new NotFoundException(ItemEntity.class, id));
+    } 
+
     @Transactional
     public ItemEntity create(ItemEntity entity) {
         if (entity == null) {

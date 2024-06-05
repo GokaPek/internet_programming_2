@@ -1,6 +1,8 @@
 package com.example.demo.users.api;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -16,9 +18,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.demo.applications.api.ApplicationDto;
+import com.example.demo.applications.model.ApplicationEntity;
+import com.example.demo.applications.service.ApplicationService;
 import com.example.demo.core.api.PageAttributesMapper;
 import com.example.demo.core.configuration.Constants;
 import com.example.demo.core.security.UserPrincipal;
+import com.example.demo.items.service.ItemService;
 //import com.example.demo.orders.api.OrderDto;
 // import com.example.demo.orders.api.OrderGroupedDto;
 // import com.example.demo.orders.model.OrderEntity;
@@ -40,13 +46,23 @@ public class UserProfileController {
     private static final String PROFILE_ATTRIBUTE = "profile";
 
     private final UserService userService;
+    private final ItemService itemService;
+    private final ApplicationService applicationService;
     private final ModelMapper modelMapper;
 
     public UserProfileController(
             UserService userService,
+            ApplicationService applicationService,
+            ItemService itemService,
             ModelMapper modelMapper) {
         this.userService = userService;
         this.modelMapper = modelMapper;
+        this.applicationService = applicationService;
+        this.itemService = itemService;
+    }
+
+    private ApplicationDto toAppDto(ApplicationEntity entity) {
+        return modelMapper.map(entity, ApplicationDto.class);
     }
 
     @GetMapping
@@ -55,19 +71,22 @@ public class UserProfileController {
             Model model,
             @AuthenticationPrincipal UserPrincipal principal) {
         final long userId = principal.getId();
+        final Map<String, Object> attributes = PageAttributesMapper.toAttributes(applicationService.getAll(userId, 0, page, 5), this::toAppDto);
+            
         model.addAttribute(PAGE_ATTRIBUTE, page);
-        // model.addAllAttributes(PageAttributesMapper.toAttributes(
-        //         userService.getLines(userId, page, Constants.DEFUALT_PAGE_SIZE),
-        //         this::toDto));
-        // model.addAttribute("stats",
-        //         lineService.getTop(0, 5).stream()
-        //                 .map(this::toGroupedDto)
-        //                 .toList());
-        // model.addAttribute("items",
-        //         itemService.getAll().stream()
-        //                 .map(this::toItemDto)
-        //                 .toList());
-        // List<LineGroupedDto> linesGr = lineService.getTop(0, 5).stream().map(this::toGroupedDto).toList();
+
+        // Загружаем имена услуг для каждого application
+        List<ApplicationDto> applicationDtos = (List<ApplicationDto>) attributes.get("items");
+        Map<Long, String> itemNames = new HashMap<>();
+        for (ApplicationDto applicationDto : applicationDtos) {
+            Long itemId = applicationDto.getItemId();
+            String itemName = itemService.getItemName(itemId);
+            itemNames.put(itemId, itemName);
+        }
+        model.addAttribute("itemNames", itemNames);
+
+        model.addAllAttributes(attributes);
+        
         return PROFILE_VIEW;
     }
 
@@ -79,12 +98,9 @@ public class UserProfileController {
     }
 
     @PostMapping("/delete/{id}")
-    public String deleteOrder(
-            @PathVariable(name = "id") Long id,
-            @RequestParam(name = PAGE_ATTRIBUTE, defaultValue = "0") int page,
-            RedirectAttributes redirectAttributes,
-            @AuthenticationPrincipal UserPrincipal principal) {
-        redirectAttributes.addAttribute(PAGE_ATTRIBUTE, page);
+    public String deleteSign(
+            @PathVariable(name = "id") Long id) {
+        applicationService.delete(id);
         return Constants.REDIRECT_VIEW + "/";
     }
 }
